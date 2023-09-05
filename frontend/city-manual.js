@@ -17,7 +17,7 @@ new Vue({
         ]
     },
     created() {
-        fetch('/api/drive-auto')
+        fetch('/api/drive-manual')
             .then(response => response.json())
             .then(data => {
                 this.results = data;
