@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mia
+      MONGO_INITDB_ROOT_PASSWORD: "AJn123871b2jh3bHJBJHBjh2bjs"
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mia
+      ME_CONFIG_MONGODB_ADMINPASSWORD: "AJn123871b2jh3bHJBJHBjh2bjs"
+      ME_CONFIG_MONGODB_URL: mongodb://mia:AJn123871b2jh3bHJBJHBjh2bjs@mongo:27017/
+#
+#  mia:
+#    build: .
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - mongo
