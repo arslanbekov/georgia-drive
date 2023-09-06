@@ -45,10 +45,7 @@ new Vue({
             fetch(this.currentRoute)
                 .then(response => response.json())
                 .then(data => {
-                    this.results = data.map(item => ({
-                        name: item.cityName,
-                        dates: item.bookingDate
-                    }));
+                    this.results = data;
                     this.loading = false;
                 })
                 .catch(error => {

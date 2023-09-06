@@ -52,7 +52,7 @@
                 <br>
                 <ul class="list-group">
                     <li v-if="cityResults(city.name).length > 0" v-for="result in cityResults(city.name)" :key="result.dates" class="list-group-item">
-                        <b>{{ result.dates }}</b>
+                        <b>{{ result.dates }}</b> <span class="badge rounded-pill text-bg-success" v-for="time in result.times" :key="time"> {{ time }}</span>
                     </li>
                     <li v-if="cityResults(city.name).length === 0" class="list-group-item">No available dates.</li>
                 </ul>
