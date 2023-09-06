@@ -6,66 +6,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driving License Exam Dates</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #f1f1f1;
-            text-align: center;
-            padding: 10px 0;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 </head>
 
 <body>
-<div id="app" class="container mt-4">
-    <h1 class="mb-4">Available dates</h1>
-    <div>
-        <button @click="setCurrentRoute('/api/get-auto')" :disabled="loading" type="button" class="btn btn-outline-primary" :class="{ active: activeRoute === '/api/get-auto' }">Auto Exam Dates</button>
-        <button @click="setCurrentRoute('/api/get-manual')" :disabled="loading" type="button" class="btn btn-outline-primary" :class="{ active: activeRoute === '/api/get-manual' }">Manual Exam Dates</button>
-        <button @click="setCurrentRoute('/api/get-theory')" :disabled="loading" type="button" class="btn btn-outline-primary" :class="{ active: activeRoute === '/api/get-theory' }">Theory Exam Dates</button>
-    </div>
+    <main class="flex-shrink-0">
+        <div id="app" class="container">
+            <div class="container text-center p-5">
+                <a href="/" class="align-items-center link-body-emphasis text-decoration-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-sign-merge-left p-1" viewBox="0 0 16 16">
+                        <path d="M7.25 6v1c-.14.301-.338.617-.588.95-.537.716-1.259 1.44-2.016 2.196l.708.708.015-.016c.652-.652 1.33-1.33 1.881-2.015V12h1.5V6h1.216a.25.25 0 0 0 .192-.41L8.192 3.23a.25.25 0 0 0-.384 0L5.842 5.59a.25.25 0 0 0 .192.41H7.25Z"/>
+                        <path d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435Zm-1.4.7a.495.495 0 0 1 .7 0l6.516 6.515a.495.495 0 0 1 0 .7L8.35 14.866a.495.495 0 0 1-.7 0L1.134 8.35a.495.495 0 0 1 0-.7L7.65 1.134Z"/>
+                    </svg>
+                </a>
+            </div>
 
-    <h2 class="mb-4">{{ currentTitle }}</h2>
-    <!-- Preloader -->
-    <div v-if="loading" class="text-center">
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
+            <div class="container text-center p-2">
+                <p class="m-100">
+                    <nav class="btn-group">
+                        <button @click="setCurrentRoute('/api/get-auto')" type="button" class="btn btn-primary" :class="{ active: activeRoute === '/api/get-auto' }">Auto Exam</button>
+                        <button @click="setCurrentRoute('/api/get-manual')" type="button" class="btn btn-primary" :class="{ active: activeRoute === '/api/get-manual' }">Manual Exam</button>
+                        <button @click="setCurrentRoute('/api/get-theory')" type="button" class="btn btn-primary" :class="{ active: activeRoute === '/api/get-theory' }">Theory Exam</button>
+                    </nav>
+                </p>
+            </div>
 
-    <!-- Displaying Results -->
-    <div v-else>
-        <!-- Tabs Navigation -->
-        <ul class="nav nav-tabs">
-            <li v-for="(city, index) in citiesOrder" :key="city.name" class="nav-item">
-                <a :class="['nav-link', { active: index === 0 }]" data-toggle="tab" :href="'#' + city.name">{{ city.name }}</a>
-            </li>
-        </ul>
+            <div class="mb-4">
+                Last sync: <b>{{ lastExecutionTime }}</b>
+            </div>
 
-        <!-- Tabs Content -->
-        <div class="tab-content">
-            <div v-for="(city, index) in citiesOrder" :key="city.name" :id="city.name" :class="['tab-pane fade', { show: index === 0, active: index === 0 }]">
-                <br>
-                <ul class="list-group">
-                    <li v-if="cityResults(city.name).length > 0" v-for="result in cityResults(city.name)" :key="result.dates" class="list-group-item">
-                        <b>{{ result.dates }}</b> <span class="badge rounded-pill text-bg-success" v-for="time in result.times" :key="time"> {{ time }}</span>
+            <!-- Preloader -->
+            <div v-if="loading" class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only"></span>
+                </div>
+            </div>
+
+            <div v-else>
+                <ul class="nav nav-tabs">
+                    <li v-for="(city, index) in citiesOrder" :key="city.name" class="nav-item">
+                        <a :class="['nav-link', { active: index === 0 }]" data-bs-toggle="tab" :href="'#' + city.name">{{ city.name }}</a>
                     </li>
-                    <li v-if="cityResults(city.name).length === 0" class="list-group-item">No available dates.</li>
                 </ul>
+
+                <div class="tab-content">
+                    <div v-for="(city, index) in citiesOrder" :key="city.name" :id="city.name" :class="['tab-pane fade', { show: index === 0, active: index === 0 }]">
+                        <br>
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th v-if="cityResults(city.name).length > 0" scope="col">Times</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <template v-for="result in cityResults(city.name)">
+                                <tr v-if="result && result.dates && cityResults(city.name).length > 0" :key="result.dates" :class="{ 'table-warning': isSaturday(result.dates) }">
+                                    <td class="w-25">
+                                        <span>{{ result.dates }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge text-bg-light m-1" v-for="time in result.times" :key="time">{{ time }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+
+                            <tr v-if="cityResults(city.name).length === 0" class="table-danger">
+                                <td>No available dates</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    </main>
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="app.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
 </body>
 
 </html>

@@ -13,6 +13,7 @@ func main() {
 	http.HandleFunc("/api/get-theory", handlers.GetTheory)
 	http.HandleFunc("/api/get-manual", handlers.GetManual)
 	http.HandleFunc("/api/get-auto", handlers.GetAuto)
+	http.HandleFunc("/api/last-exec-time", handlers.GetLastExecutionTime)
 
 	http.Handle("/", http.FileServer(http.Dir("./frontend")))
 	logrus.Info("Init completed... localhost:8080")

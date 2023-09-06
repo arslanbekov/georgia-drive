@@ -4,7 +4,7 @@ import (
 	"checkMiaDates/backend/db"
 	"encoding/json"
 	"fmt"
-	"github.com/sirupsen/logrus" // Добавим библиотеку logrus
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -25,6 +25,19 @@ var cities = map[string]int{
 	"Rustavi":     15,
 }
 
+var userAgents = []string{
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537",
+	"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/603.2.4 (KHTML, like Gecko) Version/10.1.1 Safari/603.2.4",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",
+	"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/16.16299",
+	"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134",
+	"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+	"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763",
+	"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.18362",
+}
+
 type DateEntry struct {
 	BookingDate       string `json:"bookingDate"`
 	BookingDateStatus int    `json:"bookingDateStatus"`
@@ -40,10 +53,15 @@ func init() {
 }
 
 func UpdateDates(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
 	dataCategories := map[string]string{
 		"1": "theory",
 		"3": "manual",
 		"4": "automat",
+	}
+
+	for _, collection := range dataCategories {
+		db.ClearCollection(collection)
 	}
 
 	for cityName, centerID := range cities {
@@ -107,7 +125,6 @@ func UpdateDates(w http.ResponseWriter, r *http.Request) {
 				}
 
 				if len(timeStrings) > 0 {
-					// Вместо добавления результатов в список, мы сохраняем их в MongoDB
 					entry := map[string]interface{}{
 						"name":  cityName,
 						"dates": reformattedDate,
@@ -119,6 +136,7 @@ func UpdateDates(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	db.SaveExecutionTime(startTime)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -162,15 +180,8 @@ func customHttpGet(url string) (*http.Response, error) {
 	return client.Do(req)
 }
 
-var userAgents = []string{
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537",
-	"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0",
-	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/603.2.4 (KHTML, like Gecko) Version/10.1.1 Safari/603.2.4",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",
-	"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0",
-	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edge/16.16299",
-	"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134",
-	"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-	"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763",
-	"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.18362",
+func GetLastExecutionTime(w http.ResponseWriter, r *http.Request) {
+	logrus.Info("Fetching last_exec_time")
+	data := db.FetchFromMongo("last_exec_time")
+	respondWithJSON(w, data)
 }
