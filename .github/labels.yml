@@ -1,0 +1,22 @@
+---
+- name: approved
+  description: "Label for pr-approve-label github action"
+  color: 0E8A16
+- name: deps
+  description: "Label for dependabot"
+  color: 15EFCB
+- name: gha-deps
+  description: "Label for dependabot"
+  color: B20452
+- name: go-deps
+  description: "Label for dependabot"
+  color: 000000
+- name: docs
+  description: "Label for documentation changes"
+  color: d4c5f9
+- name: on-hold
+  description: "Label for stale.yml"
+  color: D93F0B
+- name: stale
+  description: "Label for stale.yml"
+  color: ee0701

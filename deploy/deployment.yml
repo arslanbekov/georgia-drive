@@ -1,9 +1,10 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: mia
-  name: mia-deployment
+  name: mia
   namespace: mia
 spec:
   replicas: 1
