@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const API_GOV_GE = "https://api-my.sa.gov.ge/api/v1/DrivingLicensePracticalExams2"
+
 var cities = map[string]int{
 	"Kutaisi":     2,
 	"Batumi":      3,
@@ -67,7 +69,7 @@ func UpdateDates(w http.ResponseWriter, r *http.Request) {
 	for cityName, centerID := range cities {
 		for categoryCode, collection := range dataCategories {
 
-			firstEndpoint := fmt.Sprintf("https://api-my.sa.gov.ge/api/v1/DrivingLicensePracticalExams2/DrivingLicenseExamsDates2?CategoryCode=%s&CenterId=%d", categoryCode, centerID)
+			firstEndpoint := fmt.Sprintf("%s/DrivingLicenseExamsDates2?CategoryCode=%s&CenterId=%d", API_GOV_GE, categoryCode, centerID)
 			resp, err := customHttpGet(firstEndpoint)
 			if err != nil {
 				logrus.Error("Error making the request to ", firstEndpoint, ": ", err)
@@ -98,7 +100,7 @@ func UpdateDates(w http.ResponseWriter, r *http.Request) {
 					continue
 				}
 				reformattedDate := parts[2] + "-" + parts[1] + "-" + parts[0]
-				secondEndpoint := fmt.Sprintf("https://api-my.sa.gov.ge/api/v1/DrivingLicensePracticalExams2/DrivingLicenseExamsDateFrames2?CategoryCode=%s&CenterId=%d&ExamDate=%s&PersonalNumber=%s", categoryCode, centerID, reformattedDate, randomGeorgiaIds())
+				secondEndpoint := fmt.Sprintf("%s/DrivingLicenseExamsDateFrames2?CategoryCode=%s&CenterId=%d&ExamDate=%s&PersonalNumber=%s", API_GOV_GE, categoryCode, centerID, reformattedDate, randomGeorgiaIds())
 
 				resp2, err := customHttpGet(secondEndpoint)
 				if err != nil {
@@ -180,8 +182,19 @@ func customHttpGet(url string) (*http.Response, error) {
 	return client.Do(req)
 }
 
-func GetLastExecutionTime(w http.ResponseWriter, r *http.Request) {
-	logrus.Info("Fetching last_exec_time")
-	data := db.FetchFromMongo("last_exec_time")
-	respondWithJSON(w, data)
+func GetLastDateRecord(w http.ResponseWriter, r *http.Request) {
+	record, err := db.GetLastRecord()
+	if err != nil {
+		http.Error(w, "Failed to retrieve the last date record", http.StatusInternalServerError)
+		return
+	}
+
+	responseData, err := json.Marshal(record)
+	if err != nil {
+		http.Error(w, "Failed to encode response data", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseData)
 }

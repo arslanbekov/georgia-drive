@@ -32,7 +32,7 @@ new Vue({
         isSaturday(dateString) {
             if (typeof dateString !== 'string') return false;
             const date = new Date(dateString);
-            return date.getDay() === 6; // 6 - это суббота
+            return date.getDay() === 6;
         },
         setCurrentRoute(route) {
             this.loading = true;
@@ -52,7 +52,7 @@ new Vue({
         fetchLastExecutionTime() {
             axios.get("/api/last-exec-time")
                 .then(response => {
-                    const timestamp = response.data[0].timestamp;
+                    const timestamp = response.data.Timestamp;
                     const dateObj = new Date(timestamp);
                     this.lastExecutionTime = this.formatDate(dateObj);
                 })
@@ -61,7 +61,6 @@ new Vue({
                 });
         },
         formatDate(dateObj) {
-            // Форматируем дату в человекочитаемый формат
             return `${dateObj.toLocaleDateString()} ${dateObj.toLocaleTimeString()}`;
         },
         fetchData() {

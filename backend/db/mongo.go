@@ -2,13 +2,18 @@ package db
 
 import (
 	"context"
-	"github.com/sirupsen/logrus" // Импорт logrus
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"time"
 )
+
+type Record struct {
+	ID        string    `bson:"_id"`
+	Timestamp time.Time `bson:"timestamp"`
+}
 
 var client *mongo.Client
 
@@ -78,4 +83,20 @@ func SaveExecutionTime(executionTime time.Time) {
 	if err != nil {
 		logrus.Error("Failed to save execution time:", err)
 	}
+}
+
+func GetLastRecord() (*Record, error) {
+	logrus.Infof("Fetching the latest record from MongoDB collection: %s", "last_exec_time")
+	collection := client.Database("dates").Collection("last_exec_time")
+
+	filter := bson.M{}
+	findOptions := options.FindOne().SetSort(bson.M{"timestamp": -1})
+
+	var result Record
+	err := collection.FindOne(context.TODO(), filter, findOptions).Decode(&result)
+	if err != nil {
+		logrus.Error("Failed to fetch the latest record from MongoDB:", err)
+		return nil, err
+	}
+	return &result, nil
 }

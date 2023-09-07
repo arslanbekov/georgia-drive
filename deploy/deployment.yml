@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mia
+  name: mia-deployment
+  namespace: mia
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mia
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: mia
+    spec:
+      containers:
+        - env:
+            - name: MONGO_URI
+              value: "mongodb://mia:AJn123871b2jh3bHJBJHBjh2bjs@mongodb.mia:27017/admin"
+          image: eu.gcr.io/bora-systems/mia:0.1
+          imagePullPolicy: IfNotPresent
+          name: mia
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 512Mi
+            requests:
+              cpu: 20m
+              memory: 64Mi
+      nodeSelector:
+        cloud.google.com/gke-nodepool: app-pool
