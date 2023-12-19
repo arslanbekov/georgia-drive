@@ -1,5 +1,7 @@
 # Check MIA Dates
 
+![1](https://github.com/arslanbekov/georgia-drive/assets/579213/89507883-3dcd-4c2e-be7d-4968995d6fee)
+
 This project is designed to fetch and update driving exam dates and times from the Georgia government API and store them in MongoDB.
 
 It also provides endpoints to retrieve the saved data.
