@@ -2,9 +2,10 @@ package main
 
 import (
 	"checkMiaDates/backend/handlers"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {

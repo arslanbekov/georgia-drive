@@ -4,12 +4,13 @@ import (
 	"checkMiaDates/backend/db"
 	"encoding/json"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const API_GOV_GE = "https://api-my.sa.gov.ge/api/v1/DrivingLicensePracticalExams2"

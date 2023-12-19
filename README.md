@@ -33,7 +33,7 @@ It also provides endpoints to retrieve the saved data.
 2. Navigate to the project directory;
 3. Run the command `go run main.go`.
 
-> The application will start, and the logs will indicate that the application is listening on http://localhost:8080.
+> The application will start, and the logs will indicate that the application is listening on [http://localhost:8080].
 
 ## Libraries Used
 

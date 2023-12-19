@@ -24,8 +24,8 @@ spec:
       containers:
         - env:
             - name: MONGO_URI
-              value: "mongodb://mia:AJn123871b2jh3bHJBJHBjh2bjs@mongodb.mia:27017/admin"
-          image: eu.gcr.io/bora-systems/mia:0.4
+              value: "mongodb://{username}:{password}@mongodb.mia:27017/admin"
+          image: arslanbekov/mia:0.4
           imagePullPolicy: IfNotPresent
           name: mia
           ports:
@@ -47,5 +47,3 @@ spec:
             requests:
               cpu: 20m
               memory: 64Mi
-      nodeSelector:
-        cloud.google.com/gke-nodepool: app-pool
